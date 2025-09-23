@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.DTO;
+using BusinessLogicLayer.RabbitMQ;
 using BusinessLogicLayer.ServiceContracts;
 using DataAccessLayer.Entities;
 using DataAccessLayer.RepositoryContracts;
@@ -15,16 +16,20 @@ public class ProductService : IProductService
     private readonly IMapper _mapper;
     private readonly IProductsRepository _productsRepository;
 
+    private readonly IRabbitMQPublisher _rabbitMQPublisher;
+
     public ProductService(
         IValidator<ProductAddRequest> productAddRequestValidator,
         IValidator<ProductUpdateRequest> productUpdateRequestValidator,
         IMapper mapper,
-        IProductsRepository productsRepository)
+        IProductsRepository productsRepository,
+        IRabbitMQPublisher rabbitMQPublisher)
     {
         _productAddRequestValidator = productAddRequestValidator;
         _productUpdateRequestValidator = productUpdateRequestValidator;
         _mapper = mapper;
         _productsRepository = productsRepository;
+        _rabbitMQPublisher = rabbitMQPublisher;
     }
 
     public async Task<ProductResponse?> AddProduct(ProductAddRequest productAddRequest)
@@ -70,6 +75,12 @@ public class ProductService : IProductService
             return false;
         }
 
+        //Publish message to RabbitMQ
+        string routingKey = "product.delete";
+        var message = new ProductDeleteMessage(productID);
+
+        await _rabbitMQPublisher.PublishAsync<ProductDeleteMessage>(message, routingKey);
+
         return await _productsRepository.DeleteProduct(productID);
     }
 
@@ -107,8 +118,10 @@ public class ProductService : IProductService
 
     public async Task<ProductResponse?> UpdateProduct(ProductUpdateRequest productUpdateRequest)
     {
+        Product? existingProduct = await _productsRepository.GetProductByCondition(temp => temp.ProductID == productUpdateRequest.ProductID);
+
         //If product with given productId does not exist, return false
-        if (await _productsRepository.GetProductByCondition(temp => temp.ProductID == productUpdateRequest.ProductID) is null)
+        if (existingProduct is null)
         {
             throw new ArgumentNullException("Invalid productID");
         }
@@ -122,12 +135,26 @@ public class ProductService : IProductService
         }
 
 
-        //Update product in the database
+        //Map productUpdateRequest to Product object
         Product productInput = _mapper.Map<Product>(productUpdateRequest);
 
+        //Check if product name is changed
+        bool isProductNameChanged = productInput.ProductName != existingProduct.ProductName;
+
+        //Update product in the database
         Product? updatedProduct = await _productsRepository.UpdateProduct(productInput);
 
         ProductResponse updatedProductResponse = _mapper.Map<ProductResponse>(updatedProduct);
+
+        
+        if(isProductNameChanged)
+        {
+            //Publish message to RabbitMQ
+            string routingKey = "product.update.name";
+            var message = new ProductNameUpdateMessage(productInput.ProductID, productInput.ProductName);
+
+            await _rabbitMQPublisher.PublishAsync<ProductNameUpdateMessage>(message, routingKey);
+        }
 
         return updatedProductResponse;
     }

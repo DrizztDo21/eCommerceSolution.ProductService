@@ -5,11 +5,16 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "MYSQL_HOST":"localhost",
-        "MYSQL_PASSWORD":"admin",
-        "MYSQL_USER":"root",
-        "MYSQL_DATABASE":"ecommerceproductsdatabase",
-        "MYSQL_PORT":"3306"
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PASSWORD": "admin",
+        "MYSQL_USER": "root",
+        "MYSQL_DATABASE": "ecommerceproductsdatabase",
+        "MYSQL_PORT": "3306",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "admin",
+        "RABBITMQ_PASSWORD": "admin",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "product.exchange"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5237"
@@ -23,7 +28,12 @@
         "MYSQL_PASSWORD": "admin",
         "MYSQL_USER": "root",
         "MYSQL_DATABASE": "ecommerceproductsdatabase",
-        "MYSQL_PORT": "3306"
+        "MYSQL_PORT": "3306",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "admin",
+        "RABBITMQ_PASSWORD": "admin",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "product.exchange"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7274;http://localhost:5237",
@@ -38,7 +48,12 @@
         "MYSQL_PASSWORD": "admin",
         "MYSQL_USER": "root",
         "MYSQL_DATABASE": "ecommerceproductsdatabase",
-        "MYSQL_PORT": "3306"
+        "MYSQL_PORT": "3306",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "admin",
+        "RABBITMQ_PASSWORD": "admin",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "product.exchange"
       }
     },
     "Container (Dockerfile)": {
@@ -52,7 +67,12 @@
         "MYSQL_PASSWORD": "admin",
         "MYSQL_USER": "root",
         "MYSQL_DATABASE": "ecommerceproductsdatabase",
-        "MYSQL_PORT": "3306"
+        "MYSQL_PORT": "3306",
+        "RABBITMQ_HOST": "localhost",
+        "RABBITMQ_PORT": "5672",
+        "RABBITMQ_USER": "admin",
+        "RABBITMQ_PASSWORD": "admin",
+        "RABBITMQ_PRODUCTS_EXCHANGE": "product.exchange"
       },
       "publishAllPorts": true,
       "useSSL": true
